@@ -66,7 +66,7 @@ def capitalize(string):
 
 output = []
 
-text = sys.stdin.read().replace('\r','')
+text = sys.stdin.read().replace('\r', '')
 courses = [x.strip() for x in text.split("\n\n\n")]
 for course in courses:
     lines = course.split("\n")
