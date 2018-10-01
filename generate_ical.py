@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import re
@@ -47,6 +47,7 @@ WEEKDAYS = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato
 
 
 def capitalize(string):
+    string = string.decode("utf-8")
     result = []
     for x in string.split(" "):
         if (x.lower() in ("e", "dei", "del", "della", "dello", "ed", "al", "a",
@@ -60,7 +61,7 @@ def capitalize(string):
             result.append("l'" + x[2:].title())
         else:
             result.append(x.title())
-    return (" ".join(result))
+    return (" ".join(result)).encode("utf-8")
 
 
 output = []
@@ -134,4 +135,4 @@ for element in output:
     cal.add_component(event)
 calendar = cal.to_ical()
 
-print(calendar.decode('utf-8'))
+print calendar
