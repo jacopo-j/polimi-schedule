@@ -14,13 +14,26 @@ PROGR_UUID = "8DC7A5B6-6CD4-401B-9852-D6ABF7537B41"
 
 
 # Define holiday dates here, format "YYYY-MM-DD" (e.g. "2018-12-25")
-HOLIDAYS = ["2018-03-29",
-            "2018-03-30",
-            "2018-04-02",
-            "2018-04-03",
-            "2018-04-25",
-            "2018-04-30",
-            "2018-05-01"]
+HOLIDAYS = ["2018-11-01",
+            "2018-11-02",
+            "2018-11-05",
+            "2018-11-06",
+            "2018-11-07",
+            "2018-11-10",
+            "2018-12-07",
+            "2018-12-08",
+            "2018-12-09",
+            "2019-04-15",
+            "2019-04-16",
+            "2019-04-17",
+            "2019-04-18",
+            "2019-04-19",
+            "2019-04-22",
+            "2019-04-23",
+            "2019-04-24",
+            "2019-04-25",
+            "2019-04-26",
+            "2019-05-01"]
 
 
 
@@ -53,7 +66,7 @@ def capitalize(string):
 
 output = []
 
-text = sys.stdin.read()
+text = sys.stdin.read().replace('\r', '')
 courses = [x.strip() for x in text.split("\n\n\n")]
 for course in courses:
     lines = course.split("\n")
@@ -62,7 +75,7 @@ for course in courses:
     sem, from_str, to_str = re.findall(REGEX_LESSON_DATES, lines[1])[0]
     from_date = datetime.strptime(from_str, "%d/%m/%Y").date()
     to_date = (datetime.strptime(to_str, "%d/%m/%Y") + timedelta(days=1)).date()
-    for line in lines[2:]:
+    for line in lines[3:]:
         if re.match(REGEX_NO_LESSON_TEST, line):
             break
         dow, st, et, typ = re.findall(REGEX_LESSON_DATA, line)[0]
