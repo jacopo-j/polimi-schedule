@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import re
@@ -11,6 +11,10 @@ import time
 
 # IMPORTANT! Replace this with a freshly-generated UUID!
 PROGR_UUID = "8DC7A5B6-6CD4-401B-9852-D6ABF7537B41"
+
+
+# Increment this each time you generate a new version of the schedule
+SEQUENCE_NUMBER = "1"
 
 
 # Define holiday dates here, format "YYYY-MM-DD" (e.g. "2018-12-25")
@@ -42,12 +46,12 @@ REGEX_LESSON_DATES = r"Semestre: ([1-2]) Inizio lezioni: ([0-9]{2}\/[0-9]{2}\/[0
 REGEX_LESSON_DATA = r"(Lunedì|Martedì|Mercoledì|Giovedì|Venerdì|Sabato) dalle ([0-9]{2}:[0-9]{2}) alle ([0-9]{2}:[0-9]{2}), (.*?) (?:in|Aula)"
 REGEX_LESSON_ROOM_TEST = r".*? Aula al momento non disponibile.*"
 REGEX_LESSON_ROOM = r"in aula (.*?) \(.*? - .*? - (.*?) - .*"
-REGEX_NO_LESSON_TEST = r"Nessun orario definito"
+REGEX_NO_LESSON_TEST = r"\s*L'orario non è stato definito"
 WEEKDAYS = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato"]
 
 
 def capitalize(string):
-    string = string.decode("utf-8")
+    string = string
     result = []
     for x in string.split(" "):
         if (x.lower() in ("e", "dei", "del", "della", "dello", "ed", "al", "a",
@@ -61,7 +65,7 @@ def capitalize(string):
             result.append("l'" + x[2:].title())
         else:
             result.append(x.title())
-    return (" ".join(result)).encode("utf-8")
+    return (" ".join(result))
 
 
 output = []
@@ -83,7 +87,7 @@ for course in courses:
         dow, st, et, typ = re.findall(REGEX_LESSON_DATA, line)[0]
         if not re.match(REGEX_LESSON_ROOM_TEST, line):
             rm, bld = re.findall(REGEX_LESSON_ROOM, line)[0]
-            location = "{} Aula {}".format(bld, rm)
+            location = "{} Aula {}".format(bld, rm).strip()
         else:
             location = ""
         start_time = datetime.strptime(st, "%H:%M").time()
@@ -112,11 +116,12 @@ for course in courses:
 
 cal = icalendar.Calendar()
 cal.add("prodid", "Jacopo Jannone")
-sequence = str(int(time.time() * 1000000))
-last_upd_str = datetime.strftime(
-    datetime.now(),
+cal.add("version", "2.0")
+sequence = SEQUENCE_NUMBER
+dategen = datetime.now()
+last_upd = datetime.strftime(
+    dategen,
     "Generato il %d/%m/%Y alle %H:%M:%S")
-last_upd = "{}\nID versione: {}".format(last_upd_str, sequence)
 for element in output:
     event = icalendar.Event()
     start = datetime.combine(element["from"], element["start"])
@@ -134,7 +139,8 @@ for element in output:
     event.add("sequence", sequence)
     event.add("description", last_upd)
     event.add("exdate", skip_datetimes)
+    event.add("dtstamp", dategen)
     cal.add_component(event)
 calendar = cal.to_ical()
 
-print calendar
+print(calendar.decode())
