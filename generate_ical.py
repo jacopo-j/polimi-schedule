@@ -69,6 +69,8 @@ output = []
 text = sys.stdin.read().replace('\r', '')
 courses = [x.strip() for x in text.split("\n\n\n")]
 for course in courses:
+    if course == '':
+        continue
     lines = course.split("\n")
     cod, name = re.findall(REGEX_LESSON_NAME, lines[0])[0]
     name = capitalize(name.strip())
