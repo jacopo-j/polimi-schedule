@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import logging
 import re
 import sys
 from datetime import datetime, timedelta, time, date
@@ -8,6 +9,9 @@ import icalendar
 from hashlib import sha256
 import time
 
+
+logging.basicConfig(level=logging.DEBUG)
+logging.getLogger().setLevel(logging.INFO)  # Comment to read debug logging
 
 # IMPORTANT! Replace this with a freshly-generated UUID!
 PROGR_UUID = "8DC7A5B6-6CD4-401B-9852-D6ABF7537B41"
@@ -47,6 +51,7 @@ REGEX_LESSON_DATA = r"(Lunedì|Martedì|Mercoledì|Giovedì|Venerdì|Sabato) dal
 REGEX_LESSON_ROOM_TEST = r".*? Aula al momento non disponibile.*"
 REGEX_LESSON_ROOM = r"in aula (.*?) \(.*? - .*? - (.*?) - .*"
 REGEX_NO_LESSON_TEST = r"\s*L'orario non è stato definito"
+REGEX_NO_SCHEDULE_TEST = r"\s*Nessun orario definito"
 WEEKDAYS = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato"]
 
 
@@ -71,20 +76,32 @@ def capitalize(string):
 output = []
 
 text = sys.stdin.read().replace('\r', '')
-courses = [x.strip() for x in text.split("\n\n\n")]
+courses = [x.strip() for x in text.strip().split("\n\n\n")]
 for course in courses:
-    if course == '':
-        continue
+    logging.debug("Parsing course:\n'{}'".format(course))
     lines = course.split("\n")
-    cod, name = re.findall(REGEX_LESSON_NAME, lines[0])[0]
+    try:
+        cod, name = re.findall(REGEX_LESSON_NAME, lines[0])[0]
+    except IndexError:
+        logging.info("'{}' isn't a valid lesson name".format(lines[0]))
+        continue
     name = capitalize(name.strip())
-    sem, from_str, to_str = re.findall(REGEX_LESSON_DATES, lines[1])[0]
+    try:
+        sem, from_str, to_str = re.findall(REGEX_LESSON_DATES, lines[1])[0]
+    except IndexError:
+        logging.info("'{}' isn't a valid lesson description".format(lines[1]))
+        continue
     from_date = datetime.strptime(from_str, "%d/%m/%Y").date()
     to_date = (datetime.strptime(to_str, "%d/%m/%Y") + timedelta(days=1)).date()
     for line in lines[3:]:
-        if re.match(REGEX_NO_LESSON_TEST, line):
+        if re.match(REGEX_NO_LESSON_TEST, line) or \
+                re.match(REGEX_NO_SCHEDULE_TEST, line):
             break
-        dow, st, et, typ = re.findall(REGEX_LESSON_DATA, line)[0]
+        try:
+            dow, st, et, typ = re.findall(REGEX_LESSON_DATA, line)[0]
+        except IndexError:
+            logging.info("'{}' isn't a valid schedule".format(lines[1]))
+            continue
         if not re.match(REGEX_LESSON_ROOM_TEST, line):
             rm, bld = re.findall(REGEX_LESSON_ROOM, line)[0]
             location = "{} Aula {}".format(bld, rm).strip()
