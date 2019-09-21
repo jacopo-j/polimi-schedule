@@ -1,8 +1,8 @@
 # polimi-schedule
-Questo è uno script scritto in Python 2.7 che genera un file iCalendar (.ics) a partire dal formato testuale dell'Orario delle lezioni del Politecnico di Milano. Include un Servizio per macOS che permette di eseguire lo script direttamente da Google Chrome.
+Questo è uno script scritto in Python 3 che genera un file iCalendar (.ics) a partire dal formato testuale dell'Orario delle lezioni del Politecnico di Milano. Include un Servizio per macOS che permette di eseguire lo script direttamente da Google Chrome.
 
 ## Requisiti
-* Python 2.7
+* Python 3
 * Modulo `icalendar`
 
 ## Utilizzo dello script
