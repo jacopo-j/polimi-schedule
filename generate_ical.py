@@ -93,7 +93,7 @@ for course in courses:
         continue
     from_date = datetime.strptime(from_str, "%d/%m/%Y").date()
     to_date = (datetime.strptime(to_str, "%d/%m/%Y") + timedelta(days=1)).date()
-    for line in lines[3:]:
+    for line in lines[2:]:
         if re.match(REGEX_NO_LESSON_TEST, line) or \
                 re.match(REGEX_NO_SCHEDULE_TEST, line):
             break
